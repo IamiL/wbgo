@@ -1,0 +1,13 @@
+env: "local"
+nats_streaming:
+  cluster_id: test-cluster
+  client_id: client4
+postgresql:
+  host: localhost
+  port: 5432
+  database_name: wbnatslocaldb
+  username: wbnatsapp
+  password: wbapptestpass552
+http_server:
+  port: :8080
+  timeout: 4s
