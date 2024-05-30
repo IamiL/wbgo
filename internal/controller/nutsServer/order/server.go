@@ -21,11 +21,11 @@ func NewOrderSaverHandler(log *slog.Logger, orderSaver *orderService.Order) func
 
 		err := json.Unmarshal(m.Data, &newOrder)
 		if err != nil {
-			log.Info("Deserialization error", err)
+			log.Error("failed to deserialization order", err)
 			return
 		}
 		if newOrder.DateCreated == "" {
-			log.Info("Deserialization error")
+			log.Error("failed to deserialization order", err)
 			return
 		}
 		dateCreated, err := time.Parse("2006-01-02T15:04:05Z", newOrder.DateCreated)
@@ -47,7 +47,7 @@ func NewOrderSaverHandler(log *slog.Logger, orderSaver *orderService.Order) func
 				Status:      item.Status,
 			})
 		}
-		(*orderSaver).NewOrder(&models.Order{
+		if err := (*orderSaver).NewOrder(&models.Order{
 			UID:         newOrder.UID,
 			TrackNumber: newOrder.TrackNumber,
 			Entry:       newOrder.Entry,
@@ -81,7 +81,11 @@ func NewOrderSaverHandler(log *slog.Logger, orderSaver *orderService.Order) func
 			SmID:              newOrder.SmID,
 			DateCreated:       dateCreated,
 			OofShard:          newOrder.OofShard,
-		})
+		}); err != nil {
+			log.Error("failed to save order", err)
+			return
+		}
+		return
 
 	}
 }

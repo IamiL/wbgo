@@ -1,6 +1,7 @@
 package HTTPApp
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"time"
@@ -34,9 +35,12 @@ func New(
 }
 
 func (a *App) Run() error {
+	const op = "HTTPApp.Run"
+
 	err := a.engine.Run(a.port)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", op, err)
 	}
+	a.log.Info("http server started", slog.String("port", a.port))
 	return nil
 }

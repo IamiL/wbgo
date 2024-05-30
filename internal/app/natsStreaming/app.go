@@ -53,10 +53,16 @@ func (a *App) Run() error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
+	a.log.Info("nats streaming server started")
 	return nil
 }
 
 func (a *App) Stop() {
+	const op = "natsStreamingApp.Stop"
+
+	a.log.With(slog.String("op", op)).
+		Info("stopping nats streaming server")
+
 	(*a.sub).Unsubscribe()
 	(*a.natsStreamConnect).Close()
 }

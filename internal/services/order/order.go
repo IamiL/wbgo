@@ -2,6 +2,7 @@ package orderService
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"wbnats/internal/services/order/models"
 )
@@ -32,19 +33,35 @@ func New(
 	}
 }
 
-func (o *Order) NewOrder(order *models.Order) {
+func (o *Order) NewOrder(order *models.Order) error {
+	const op = "Order.NewOrder"
+
+	log := o.log.With(
+		slog.String("op", op),
+		slog.String("orderUID", order.UID),
+	)
+
+	log.Info("processing a new order")
+
 	err := o.ordSaver.SaveOrder(order)
 	if err != nil {
-		o.log.Error("asd", err)
-		return
+		return fmt.Errorf("%s: %w", op, err)
 	}
+	return nil
 }
 
 func (o *Order) Order(ctx context.Context, uid string) (models.Order, error) {
+	const op = "Order.Order"
 
+	log := o.log.With(
+		slog.String("op", op),
+		slog.String("orderUID", uid),
+	)
+
+	log.Info("getting order information")
 	order, err := o.ordProvider.Order(ctx, uid)
 	if err != nil {
-		return models.Order{}, err
+		return models.Order{}, fmt.Errorf("%s: %w", op, err)
 	}
 	return order, nil
 }
